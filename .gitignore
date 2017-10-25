@@ -3,3 +3,8 @@
 *.o
 faster_rcnn_models
 .idea
+VGGnet_fast_rcnn_iter_70000.ckpt
+VOCdevkit/
+data/VOCdevkit2007
+data/pretrain_model/
+.DS_Store
