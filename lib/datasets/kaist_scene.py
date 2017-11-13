@@ -22,19 +22,21 @@ import pdb
 
 
 class kaist_scene(imdb):
-    def __init__(self, image_set, year, devkit_path=None):
-        imdb.__init__(self, 'kaist_' + year + '_' + image_set)
-        self._year = year
+    def __init__(self, image_set, devkit_path=None):
+        imdb.__init__(self, 'kaist_' + image_set)
         self._image_set = image_set
         self._devkit_path = self._get_default_path() if devkit_path is None \
                             else devkit_path
-        self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)
-        self._classes = ('__background__', # always index 0
-                         'aeroplane', 'bicycle', 'bird', 'boat',
-                         'bottle', 'bus', 'car', 'cat', 'chair',
-                         'cow', 'diningtable', 'dog', 'horse',
-                         'motorbike', 'person', 'pottedplant',
-                         'sheep', 'sofa', 'train', 'tvmonitor')
+        self._data_path = os.path.join(self._devkit_path, 'kaist')
+
+        # read classes of kaist dataset
+        self._classes = self._read_classes()
+        # self._classes = ('__background__', # always index 0
+        #                  'aeroplane', 'bicycle', 'bird', 'boat',
+        #                  'bottle', 'bus', 'car', 'cat', 'chair',
+        #                  'cow', 'diningtable', 'dog', 'horse',
+        #                  'motorbike', 'person', 'pottedplant',
+        #                  'sheep', 'sofa', 'train', 'tvmonitor')
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))
         self._image_ext = '.jpg'
         self._image_index = self._load_image_set_index()
@@ -53,9 +55,7 @@ class kaist_scene(imdb):
                        'min_size'    : 2}
 
         assert os.path.exists(self._devkit_path), \
-                'VOCdevkit path does not exist: {}'.format(self._devkit_path)
-        assert os.path.exists(self._data_path), \
-                'Path does not exist: {}'.format(self._data_path)
+                'Kaist dataset path does not exist: {}'.format(self._devkit_path)
 
     def image_path_at(self, i):
         """
@@ -67,8 +67,7 @@ class kaist_scene(imdb):
         """
         Construct an image path from the image's "index" identifier.
         """
-        image_path = os.path.join(self._data_path, 'JPEGImages',
-                                  index + self._image_ext)
+        image_path = os.path.join(self._devkit_path, self._kaistDatasetDF.iloc[index]['img_src'])
         assert os.path.exists(image_path), \
                 'Path does not exist: {}'.format(image_path)
         return image_path
@@ -79,19 +78,40 @@ class kaist_scene(imdb):
         """
         # Example path to image set file:
         # self._devkit_path + /VOCdevkit2007/VOC2007/ImageSets/Main/val.txt
-        image_set_file = os.path.join(self._data_path, 'ImageSets', 'Main',
-                                      self._image_set + '.txt')
-        assert os.path.exists(image_set_file), \
-                'Path does not exist: {}'.format(image_set_file)
-        with open(image_set_file) as f:
-            image_index = [x.strip() for x in f.readlines()]
-        return image_index
+
+        return list(self._kaistDatasetDF.index)
+        # return list(self._kaistDatasetDF.index.astype(str))
+
+        # image_set_file = os.path.join(self._data_path, 'ImageSets', 'Main',
+        #                               self._image_set + '.txt')
+        # assert os.path.exists(image_set_file), \
+        #         'Path does not exist: {}'.format(image_set_file)
+        # with open(image_set_file) as f:
+        #     image_index = [x.strip() for x in f.readlines()]
+        # return image_index
 
     def _get_default_path(self):
         """
         Return the default path where PASCAL VOC is expected to be installed.
+
+        Users/jongoon/Documents/GitHub/python_study/image_training/kaist_dataset
+
         """
-        return os.path.join(cfg.DATA_DIR, 'VOCdevkit' + self._year)
+        return '/Users/jongoon/Documents/GitHub/python_study/image_training'
+        return os.path.join(cfg.DATA_DIR, 'kaist_dataset')
+
+    def _read_classes(self):
+        """
+        Return the default path where PASCAL VOC is expected to be installed.
+
+        Users/jongoon/Documents/GitHub/python_study/image_training/kaist_dataset
+
+        """
+        import pandas as pd
+        self._kaistDatasetDF = pd.read_csv(os.path.join(self._devkit_path, 'kaist_rcnn.csv'), index_col=False)
+
+        self._classes = sorted(self._kaistDatasetDF['char'].unique())
+        return self._classes
 
     def gt_roidb(self):
         """
@@ -106,7 +126,7 @@ class kaist_scene(imdb):
             print '{} gt roidb loaded from {}'.format(self.name, cache_file)
             return roidb
 
-        gt_roidb = [self._load_pascal_annotation(index)
+        gt_roidb = [self._load_kaist_annotation(index)
                     for index in self.image_index]
         with open(cache_file, 'wb') as fid:
             cPickle.dump(gt_roidb, fid, cPickle.HIGHEST_PROTOCOL)
@@ -180,7 +200,7 @@ class kaist_scene(imdb):
 
         return self.create_roidb_from_box_list(box_list, gt_roidb)
 
-    def _load_pascal_annotation(self, index):
+    def _load_kaist_annotation(self, index):
         """
         Load image and bounding boxes info from XML file in the PASCAL VOC
         format.

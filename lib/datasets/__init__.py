@@ -15,7 +15,7 @@ from .nissan import nissan
 from .nthu import nthu
 from . import factory
 from .kaist_scene import kaist_scene
-from .coco import coco
+# from .coco import coco
 
 import os.path as osp
 ROOT_DIR = osp.join(osp.dirname(__file__), '..', '..')
