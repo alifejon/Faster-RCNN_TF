@@ -17,9 +17,9 @@ import cPickle
 import json
 import uuid
 # COCO API
-from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
-from pycocotools import mask as COCOmask
+# from pycocotools.coco import COCO
+# from pycocotools.cocoeval import COCOeval
+# from pycocotools import mask as COCOmask
 
 def _filter_crowd_proposals(roidb, crowd_thresh):
     """

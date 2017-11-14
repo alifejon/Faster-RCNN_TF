@@ -22,13 +22,13 @@ import pdb
 
 
 class kaist_scene(imdb):
-    def __init__(self, image_set, year, devkit_path=None):
-        imdb.__init__(self, 'kaist_' + year + '_' + image_set)
-        self._year = year
+    def __init__(self, image_set, devkit_path=None, dataset_path=None):
+        imdb.__init__(self, 'kaist_' + image_set)
         self._image_set = image_set
         self._devkit_path = self._get_default_path() if devkit_path is None \
                             else devkit_path
-        self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)
+        self._data_path = os.path.join(self._devkit_path, 'kaist')
+        self._dataset_info_path = os.path.join(self._devkit_path, 'kaist')
         self._classes = ('__background__', # always index 0
                          'aeroplane', 'bicycle', 'bird', 'boat',
                          'bottle', 'bus', 'car', 'cat', 'chair',

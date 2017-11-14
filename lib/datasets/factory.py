@@ -13,6 +13,8 @@ import datasets.pascal_voc
 import datasets.imagenet3d
 import datasets.kitti
 import datasets.kitti_tracking
+import datasets.coco
+
 import numpy as np
 
 def _selective_search_IJCV_top_k(split, year, top_k):
@@ -60,13 +62,13 @@ for split in ['train', 'val', 'trainval', 'test']:
 for year in ['2014']:
     for split in ['train', 'val', 'minival', 'valminusminival']:
         name = 'coco_{}_{}'.format(year, split)
-        __sets[name] = (lambda split=split, year=year: coco(split, year))
+        __sets[name] = (lambda split=split, year=year: datasets.coco(split, year))
 
 # Set up coco_2015_<split>
 for year in ['2015']:
     for split in ['test', 'test-dev']:
         name = 'coco_{}_{}'.format(year, split)
-        __sets[name] = (lambda split=split, year=year: coco(split, year))
+        __sets[name] = (lambda split=split, year=year: datasets.coco(split, year))
 
 # NTHU dataset
 for split in ['71', '370']:
@@ -74,6 +76,13 @@ for split in ['71', '370']:
     print name
     __sets[name] = (lambda split=split:
             datasets.nthu(split))
+
+# KAIST dataset
+for split in ['train', 'val', 'trainval', 'test']:
+    name = 'kaist_{}'.format(split)
+    print name
+    __sets[name] = (lambda split=split:
+            datasets.kaist_scene(split))
 
 
 def get_imdb(name):

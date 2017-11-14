@@ -125,9 +125,11 @@ if __name__ == '__main__':
     for i in xrange(2):
         _, _= im_detect(sess, net, im)
 
-    im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
-                '001763.jpg', '004545.jpg']
-
+    # im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
+    #             '001763.jpg', '004545.jpg']
+    from os import listdir, path, makedirs
+    from os.path import isfile, isdir, join, basename
+    im_names = [f for f in listdir(join(cfg.DATA_DIR, 'demo')) if isfile(join(cfg.DATA_DIR, 'demo', f)) and '.DS_Store' not in f]
 
     for im_name in im_names:
         print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
