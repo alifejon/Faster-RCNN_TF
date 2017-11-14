@@ -14,7 +14,7 @@ import datasets.imagenet3d
 import datasets.kitti
 import datasets.kitti_tracking
 import datasets.coco
-
+import datasets.kaist_scene
 import numpy as np
 
 def _selective_search_IJCV_top_k(split, year, top_k):
@@ -25,6 +25,13 @@ def _selective_search_IJCV_top_k(split, year, top_k):
     imdb.roidb_handler = imdb.selective_search_IJCV_roidb
     imdb.config['top_k'] = top_k
     return imdb
+
+
+# Set up voc_<year>_<split> using selective search "fast" mode
+for split in ['train', 'val', 'trainval', 'test']:
+    name = 'kaist_{}'.format(split)
+    __sets[name] = (lambda split=split:
+            datasets.kaist_scene(split))
 
 # Set up voc_<year>_<split> using selective search "fast" mode
 for year in ['2007', '2012']:
