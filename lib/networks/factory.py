@@ -19,15 +19,15 @@ import tensorflow as tf
 #__sets['VGGnet_test'] = networks.VGGnet_test()
 
 
-def get_network(name):
+def get_network(name, num_classes=None):
     """Get a network by name."""
     #if not __sets.has_key(name):
     #    raise KeyError('Unknown dataset: {}'.format(name))
     #return __sets[name]
     if name.split('_')[1] == 'test':
-       return networks.VGGnet_test()
+       return networks.VGGnet_test(_n_classes=num_classes)
     elif name.split('_')[1] == 'train':
-       return networks.VGGnet_train()
+       return networks.VGGnet_train(_n_classes=num_classes)
     else:
        raise KeyError('Unknown dataset: {}'.format(name))
     

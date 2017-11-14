@@ -61,10 +61,9 @@ def proposal_target_layer(rpn_rois, gt_boxes,_num_classes):
     labels = labels.reshape(-1,1)
     bbox_targets = bbox_targets.reshape(-1,_num_classes*4)
     bbox_inside_weights = bbox_inside_weights.reshape(-1,_num_classes*4)
-
     bbox_outside_weights = np.array(bbox_inside_weights > 0).astype(np.float32)
 
-    return rois,labels,bbox_targets,bbox_inside_weights,bbox_outside_weights
+    return rois, labels, bbox_targets, bbox_inside_weights, bbox_outside_weights
 
 def _get_bbox_regression_labels(bbox_target_data, num_classes):
     """Bounding-box regression targets (bbox_target_data) are stored in a
@@ -81,11 +80,13 @@ def _get_bbox_regression_labels(bbox_target_data, num_classes):
     clss = np.array(bbox_target_data[:, 0], dtype=np.uint16, copy=True)
     bbox_targets = np.zeros((clss.size, 4 * num_classes), dtype=np.float32)
     bbox_inside_weights = np.zeros(bbox_targets.shape, dtype=np.float32)
+
     inds = np.where(clss > 0)[0]
     for ind in inds:
         cls = clss[ind]
         start = 4 * cls
         end = start + 4
+
         bbox_targets[ind, start:end] = bbox_target_data[ind, 1:]
         bbox_inside_weights[ind, start:end] = cfg.TRAIN.BBOX_INSIDE_WEIGHTS
     return bbox_targets, bbox_inside_weights
@@ -110,6 +111,7 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
     """Generate a random sample of RoIs comprising foreground and background
     examples.
     """
+
     # overlaps: (rois x gt_boxes)
     overlaps = bbox_overlaps(
         np.ascontiguousarray(all_rois[:, 1:5], dtype=np.float),

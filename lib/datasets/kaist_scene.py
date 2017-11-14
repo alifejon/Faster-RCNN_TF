@@ -20,7 +20,6 @@ from voc_eval import voc_eval
 from fast_rcnn.config import cfg
 import pdb
 
-
 class kaist_scene(imdb):
     def __init__(self, image_set, devkit_path=None, dataset_path=None):
         imdb.__init__(self, 'kaist_' + image_set)
@@ -68,7 +67,7 @@ class kaist_scene(imdb):
         """
         Construct an image path from the image's "index" identifier.
         """
-        image_path = os.path.join(self._devkit_path, self._kaistDatasetDF.iloc[index]['img_src'])
+        image_path = os.path.join(self._devkit_path, index)
         assert os.path.exists(image_path), \
                 'Path does not exist: {}'.format(image_path)
         return image_path
@@ -80,7 +79,7 @@ class kaist_scene(imdb):
         # Example path to image set file:
         # self._devkit_path + /VOCdevkit2007/VOC2007/ImageSets/Main/val.txt
 
-        return list(self._kaistDatasetDF.index)
+        return list(self._kaistDatasetDF['origin_path'].unique())
         # return list(self._kaistDatasetDF.index.astype(str))
 
         # image_set_file = os.path.join(self._data_path, 'ImageSets', 'Main',
@@ -98,7 +97,7 @@ class kaist_scene(imdb):
         Users/jongoon/Documents/GitHub/python_study/image_training/kaist_dataset
 
         """
-        return '/Users/jongoon/Documents/GitHub/python_study/image_training'
+        return ''
         return os.path.join(cfg.DATA_DIR, 'kaist_dataset')
 
     def _read_classes(self):
@@ -111,7 +110,7 @@ class kaist_scene(imdb):
         import pandas as pd
         self._kaistDatasetDF = pd.read_csv(os.path.join(self._devkit_path, 'kaist_rcnn.csv'), index_col=False)
 
-        self._classes = sorted(self._kaistDatasetDF['char'].unique())
+        self._classes = ['__background__'] + sorted(self._kaistDatasetDF['char'].unique())
         return self._classes
 
     def gt_roidb(self):
@@ -206,17 +205,8 @@ class kaist_scene(imdb):
         Load image and bounding boxes info from XML file in the PASCAL VOC
         format.
         """
-        filename = os.path.join(self._data_path, 'Annotations', index + '.xml')
-        tree = ET.parse(filename)
-        objs = tree.findall('object')
-        if not self.config['use_diff']:
-            # Exclude the samples labeled as difficult
-            non_diff_objs = [
-                obj for obj in objs if int(obj.find('difficult').text) == 0]
-            # if len(non_diff_objs) != len(objs):
-            #     print 'Removed {} difficult objects'.format(
-            #         len(objs) - len(non_diff_objs))
-            objs = non_diff_objs
+
+        objs = self._kaistDatasetDF.loc[self._kaistDatasetDF['origin_path'] == index]
         num_objs = len(objs)
 
         boxes = np.zeros((num_objs, 4), dtype=np.uint16)
@@ -226,14 +216,13 @@ class kaist_scene(imdb):
         seg_areas = np.zeros((num_objs), dtype=np.float32)
 
         # Load object bounding boxes into a data frame.
-        for ix, obj in enumerate(objs):
-            bbox = obj.find('bndbox')
+        for ix, obj in enumerate(objs.iterrows()):
             # Make pixel indexes 0-based
-            x1 = float(bbox.find('xmin').text) - 1
-            y1 = float(bbox.find('ymin').text) - 1
-            x2 = float(bbox.find('xmax').text) - 1
-            y2 = float(bbox.find('ymax').text) - 1
-            cls = self._class_to_ind[obj.find('name').text.lower().strip()]
+            x1 = float(obj[1]['x1']) - 1
+            y1 = float(obj[1]['y1']) - 1
+            x2 = float(obj[1]['x2']) - 1
+            y2 = float(obj[1]['y2']) - 1
+            cls = obj[1]['label']
             boxes[ix, :] = [x1, y1, x2, y2]
             gt_classes[ix] = cls
             overlaps[ix, cls] = 1.0

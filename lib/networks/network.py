@@ -185,7 +185,6 @@ class Network(object):
         if isinstance(input[0], tuple):
             input[0] = input[0][0]
         with tf.variable_scope(name) as scope:
-
             rois,labels,bbox_targets,bbox_inside_weights,bbox_outside_weights = tf.py_func(proposal_target_layer_py,[input[0],input[1],classes],[tf.float32,tf.float32,tf.float32,tf.float32,tf.float32])
 
             rois = tf.reshape(rois,[-1,5] , name = 'rois') 

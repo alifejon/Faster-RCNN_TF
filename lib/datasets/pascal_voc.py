@@ -100,11 +100,11 @@ class pascal_voc(imdb):
         This function loads/saves from/to a cache file to speed up future calls.
         """
         cache_file = os.path.join(self.cache_path, self.name + '_gt_roidb.pkl')
-        if os.path.exists(cache_file):
-            with open(cache_file, 'rb') as fid:
-                roidb = cPickle.load(fid)
-            print '{} gt roidb loaded from {}'.format(self.name, cache_file)
-            return roidb
+        # if os.path.exists(cache_file):
+        #     with open(cache_file, 'rb') as fid:
+        #         roidb = cPickle.load(fid)
+        #     print '{} gt roidb loaded from {}'.format(self.name, cache_file)
+        #     return roidb
 
         gt_roidb = [self._load_pascal_annotation(index)
                     for index in self.image_index]

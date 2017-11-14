@@ -6,7 +6,12 @@ _feat_stride = [16,]
 anchor_scales = [8, 16, 32] 
 
 class VGGnet_test(Network):
-    def __init__(self, trainable=True):
+    def __init__(self, _n_classes=None, trainable=True):
+        if n_classes is not None:
+            self.n_classes = _n_classes
+        else:
+            self.n_classes = n_classes
+
         self.inputs = []
         self.data = tf.placeholder(tf.float32, shape=[None, None, None, 3])
         self.im_info = tf.placeholder(tf.float32, shape=[None, 3])
@@ -56,9 +61,9 @@ class VGGnet_test(Network):
              .roi_pool(7, 7, 1.0/16, name='pool_5')
              .fc(4096, name='fc6')
              .fc(4096, name='fc7')
-             .fc(n_classes, relu=False, name='cls_score')
+             .fc(self.n_classes, relu=False, name='cls_score')
              .softmax(name='cls_prob'))
 
         (self.feed('fc7')
-             .fc(n_classes*4, relu=False, name='bbox_pred'))
+             .fc(self.n_classes*4, relu=False, name='bbox_pred'))
 
