@@ -121,8 +121,8 @@ def _compute_targets(rois, overlaps, labels, num_classes):
 
     targets_dx = (gt_ctr_x - ex_ctr_x) / ex_widths
     targets_dy = (gt_ctr_y - ex_ctr_y) / ex_heights
-    targets_dw = np.log(gt_widths / ex_widths)
-    targets_dh = np.log(gt_heights / ex_heights)
+    targets_dw = np.log(gt_widths / ex_widths + cfg.EPS)
+    targets_dh = np.log(gt_heights / ex_heights + cfg.EPS)
 
     targets = np.zeros((rois.shape[0], 5), dtype=np.float32)
     targets[ex_inds, 0] = labels[ex_inds]

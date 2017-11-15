@@ -8,3 +8,5 @@ VOCdevkit/
 data/VOCdevkit2007
 data/pretrain_model/
 .DS_Store
+*.bak
+output
