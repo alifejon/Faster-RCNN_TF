@@ -97,7 +97,7 @@ class kaist_scene(imdb):
         Users/jongoon/Documents/GitHub/python_study/image_training/kaist_dataset
 
         """
-        return ''
+        return '/Users/ali.jeon/Documents/GitHub/python_study/image_training/'
         return os.path.join(cfg.DATA_DIR, 'kaist_dataset')
 
     def _read_classes(self):
