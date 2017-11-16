@@ -11,6 +11,8 @@ import argparse
 from networks.factory import get_network
 
 
+plt.switch_backend('agg')
+
 CLASSES = ('__background__',
            'aeroplane', 'bicycle', 'bird', 'boat',
            'bottle', 'bus', 'car', 'cat', 'chair',
@@ -70,6 +72,7 @@ def demo(sess, net, image_name):
     # Visualize detections for each class
     im = im[:, :, (2, 1, 0)]
     fig, ax = plt.subplots(figsize=(12, 12))
+    fig.savefig(image_name + '.result.png')
     ax.imshow(im, aspect='equal')
 
     CONF_THRESH = 0.8
@@ -83,6 +86,7 @@ def demo(sess, net, image_name):
         keep = nms(dets, NMS_THRESH)
         dets = dets[keep, :]
         vis_detections(im, cls, dets, ax, thresh=CONF_THRESH)
+    plt.close(fig)
 
 def parse_args():
     """Parse input arguments."""
@@ -125,16 +129,14 @@ if __name__ == '__main__':
     for i in xrange(2):
         _, _= im_detect(sess, net, im)
 
-    # im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
-    #             '001763.jpg', '004545.jpg']
-    from os import listdir, path, makedirs
-    from os.path import isfile, isdir, join, basename
-    im_names = [f for f in listdir(join(cfg.DATA_DIR, 'demo')) if isfile(join(cfg.DATA_DIR, 'demo', f)) and '.DS_Store' not in f]
+    im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
+                '001763.jpg', '004545.jpg']
+
 
     for im_name in im_names:
         print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         print 'Demo for data/demo/{}'.format(im_name)
         demo(sess, net, im_name)
 
-    plt.show()
+    #plt.show()
 
