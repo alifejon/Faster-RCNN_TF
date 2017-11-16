@@ -149,5 +149,5 @@ def _filter_boxes(boxes, min_size):
     hs = boxes[:, 3] - boxes[:, 1] + 1
     keep = np.where((ws >= min_size) & (hs >= min_size))[0]
 
-    print(ws, hs, keep)
+    print(np.min(ws), np.min(hs), np.min(keep), np.max(ws), np.max(hs), np.max(keep))
     return keep
