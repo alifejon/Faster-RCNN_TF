@@ -35,7 +35,7 @@ cfg = __C
 __C.TRAIN = edict()
 #__C.NET_NAME = 'VGGnet'
 # learning rate
-__C.TRAIN.LEARNING_RATE = 0.0001
+__C.TRAIN.LEARNING_RATE = 0.001
 __C.TRAIN.MOMENTUM = 0.9
 __C.TRAIN.GAMMA = 0.1
 __C.TRAIN.STEPSIZE = 50000
