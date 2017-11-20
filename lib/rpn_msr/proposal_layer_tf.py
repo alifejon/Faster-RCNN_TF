@@ -145,7 +145,7 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,_feat_stri
 
 def _filter_boxes(boxes, min_size):
     """Remove all boxes with any side smaller than min_size."""
-    # print(np.min(boxes), np.max(boxes))
+    print(np.min(boxes), np.max(boxes))
     ws = boxes[:, 2] - boxes[:, 0] + 1
     hs = boxes[:, 3] - boxes[:, 1] + 1
     keep = np.where((ws >= min_size) & (hs >= min_size))[0]
