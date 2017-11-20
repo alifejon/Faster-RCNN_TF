@@ -8,14 +8,17 @@
 import numpy as np
 from fast_rcnn.config import cfg
 
+import traceback
+
 def bbox_transform(ex_rois, gt_rois):
+    # traceback.print_stack()
     ex_widths = ex_rois[:, 2] - ex_rois[:, 0] + 1.0
     ex_heights = ex_rois[:, 3] - ex_rois[:, 1] + 1.0
     ex_ctr_x = ex_rois[:, 0] + 0.5 * ex_widths
     ex_ctr_y = ex_rois[:, 1] + 0.5 * ex_heights
 
     gt_widths = gt_rois[:, 2] - gt_rois[:, 0] + 1.0
-    print('gt_rois[:, 2], gt_rois[:, 0], gt_widths = ', gt_rois[:, 2], gt_rois[:, 0], gt_widths)
+    # print('gt_rois[:, 2], gt_rois[:, 0], gt_widths = ', gt_rois[:, 2], gt_rois[:, 0], gt_widths)
     gt_heights = gt_rois[:, 3] - gt_rois[:, 1] + 1.0
     gt_ctr_x = gt_rois[:, 0] + 0.5 * gt_widths
     gt_ctr_y = gt_rois[:, 1] + 0.5 * gt_heights
@@ -76,4 +79,6 @@ def clip_boxes(boxes, im_shape):
     boxes[:, 2::4] = np.maximum(np.minimum(boxes[:, 2::4], im_shape[1] - 1), 0)
     # y2 < im_shape[0]
     boxes[:, 3::4] = np.maximum(np.minimum(boxes[:, 3::4], im_shape[0] - 1), 0)
+
+    # print('boxes', boxes[:, 0::4])
     return boxes
