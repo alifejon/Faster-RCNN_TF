@@ -25,7 +25,7 @@ EXTRA_ARGS_SLUG=${EXTRA_ARGS// /_}
 case $DATASET in
   kaist)
     TRAIN_IMDB="kaist_trainval"
-    TEST_IMDB="kaist_test"
+    TEST_IMDB="kaist_trainval"
     PT_DIR="kaist"
     ITERS=70000
     ;;
@@ -72,3 +72,10 @@ time python ./tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
   --cfg experiments/cfgs/faster_rcnn_end2end.yml \
   --network VGGnet_test \
   ${EXTRA_ARGS}
+
+#time python ./tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
+#  --weights ${NET_FINAL} \
+#  --imdb ${TEST_IMDB} \
+#  --cfg experiments/cfgs/faster_rcnn_end2end.yml \
+#  --network VGGnet_test \
+#  ${EXTRA_ARGS}

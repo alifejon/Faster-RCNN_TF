@@ -217,14 +217,14 @@ class kaist_scene(imdb):
         # Load object bounding boxes into a data frame.
         for ix, obj in enumerate(objs.iterrows()):
             # Make pixel indexes 0-based
-            x1 = float(obj[1]['x1'])
-            y1 = float(obj[1]['y1'])
-            x2 = float(obj[1]['x2'])
-            y2 = float(obj[1]['y2'])
-            # x1 = float(obj[1]['x1']) - 1
-            # y1 = float(obj[1]['y1']) - 1
-            # x2 = float(obj[1]['x2']) - 1
-            # y2 = float(obj[1]['y2']) - 1
+            # x1 = float(obj[1]['x1'])
+            # y1 = float(obj[1]['y1'])
+            # x2 = float(obj[1]['x2'])
+            # y2 = float(obj[1]['y2'])
+            x1 = float(obj[1]['x1']) - 1
+            y1 = float(obj[1]['y1']) - 1
+            x2 = float(obj[1]['x2']) - 1
+            y2 = float(obj[1]['y2']) - 1
             cls = obj[1]['label']
             boxes[ix, :] = [x1, y1, x2, y2]
             gt_classes[ix] = cls
