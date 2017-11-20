@@ -41,7 +41,7 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, _feat_stride = [
         _count = 0
 
     # allow boxes to sit over the edge by a small amount
-    _allowed_border =  0
+    _allowed_border = 0
     # map of shape (..., H, W)
     #height, width = rpn_cls_score.shape[1:3]
 
@@ -178,6 +178,7 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, _feat_stride = [
         _sums += bbox_targets[labels == 1, :].sum(axis=0)
         _squared_sums += (bbox_targets[labels == 1, :] ** 2).sum(axis=0)
         _counts += np.sum(labels == 1)
+        print '_counts', _counts
         means = _sums / _counts
         stds = np.sqrt(_squared_sums / _counts - means ** 2)
         print 'means:'
