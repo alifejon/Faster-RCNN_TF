@@ -13,3 +13,5 @@ output
 kaist_dataset/
 cache
 logs
+results
+*.pkl
