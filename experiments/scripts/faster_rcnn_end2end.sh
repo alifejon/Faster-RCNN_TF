@@ -63,7 +63,7 @@ time python ./tools/train_net.py --device ${DEV} --device_id ${DEV_ID} \
   ${EXTRA_ARGS}
 
 set +x
-NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print $4}'`
+NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{#print$4}'`
 set -x
 
 time python ./tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
