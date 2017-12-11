@@ -15,6 +15,7 @@ import datasets.kitti
 import datasets.kitti_tracking
 import datasets.coco
 import datasets.kaist_scene
+import datasets.phd08
 import numpy as np
 
 def _selective_search_IJCV_top_k(split, year, top_k):
@@ -91,6 +92,12 @@ for split in ['train', 'val', 'trainval', 'test']:
     __sets[name] = (lambda split=split:
             datasets.kaist_scene(split))
 
+# PHD08 dataset
+for split in ['train', 'val', 'trainval', 'test']:
+    name = 'phd08_{}'.format(split)
+    print name
+    __sets[name] = (lambda split=split:
+            datasets.phd08.phd08(split))
 
 def get_imdb(name):
     """Get an imdb (image database) by name."""
