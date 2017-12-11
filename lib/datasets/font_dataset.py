@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image, ImageFont, ImageDraw
 
+from xml.etree.ElementTree import Element, SubElement, ElementTree, dump
+
 import random
 import copy
 from string import ascii_lowercase, ascii_uppercase
@@ -139,7 +141,52 @@ class Sample_IMG():
 
             self.boxes.append(box)
 
-    def prn(self, chDataset=None, filename=None):
+
+    def makeXML(self, char_list, img_filename, idx=None, output_path=None):
+        # char_info: (x, y, font_size, font_size)
+
+        def indent(elem, level=0):
+            i = "\n" + level * "    "
+            if len(elem):
+                if not elem.text or not elem.text.strip():
+                    elem.text = i + "    "
+                if not elem.tail or not elem.tail.strip():
+                    elem.tail = i
+                for elem in elem:
+                    indent(elem, level + 1)
+                if not elem.tail or not elem.tail.strip():
+                    elem.tail = i
+            else:
+                if level and (not elem.tail or not elem.tail.strip()):
+                    elem.tail = i
+
+        annotation = Element("annotation")
+        SubElement(annotation, "folder").text = output_path.split('/')[-1]
+        SubElement(annotation, "filename").text = str(img_filename.split('/')[-1])
+        size = Element("size")
+        annotation.append(size)
+        SubElement(size, "width").text = str(self.width)
+        SubElement(size, "height").text = str(self.height)
+        SubElement(size, "depth").text = '3'
+
+        for ch_info in char_list:
+            obj = Element("object")
+            annotation.append(obj)
+            SubElement(obj, "name").text = ch_info[1]
+            bndbox = Element("bndbox")
+            obj.append(bndbox)
+
+            x, y, width, height = ch_info[0]
+
+            SubElement(bndbox, "xmin").text = str(x)
+            SubElement(bndbox, "ymin").text = str(y)
+            SubElement(bndbox, "xmax").text = str(width)
+            SubElement(bndbox, "ymax").text = str(height)
+
+        indent(annotation)
+        ElementTree(annotation).write(os.path.join(output_path, 'annotations', '%d.xml' % idx), encoding='utf-8')
+
+    def prn(self, chDataset=None, idx=None, output_path=None):
         '''
 
         :param chDataset:
@@ -149,6 +196,8 @@ class Sample_IMG():
         # print('fill_area', self.fill_area, 'width', self.width, 'height', self.height)
         # print('chars', [ch for ch in self.chars])
         # print('# of chars', sum([len(ch[2]) for ch in self.chars]))
+
+        char_list = []
 
         base_font = ImageFont.truetype('/Library/Fonts/AppleGothic.ttf', 10)
         if chDataset is not None:
@@ -163,21 +212,26 @@ class Sample_IMG():
                 imFont = chDataset.getIMFont(font, font_size)
                 draw.text(box[:2], ''.join(chars), font=imFont, fill=(0, 0, 0))
 
-                label_box = [box[0], box[1] - 10]
-                draw.text(label_box, ''.join(chars) + font.split('/')[-1], font=base_font, fill=(256, 0, 0))
-                draw.rectangle(box, outline=(256, 0, 0))
+                # label_box = [box[0], box[1] - 10]
+                # draw.text(label_box, ''.join(chars) + font.split('/')[-1], font=base_font, fill=(256, 0, 0))
+                # draw.rectangle(box, outline=(256, 0, 0))
 
                 width_offset = 0
                 for ch in chars:
                     ch_width, ch_height = imFont.getsize(ch)
                     ch_box = (box[0] + width_offset, box[1], box[0] + width_offset + ch_width, box[1] + ch_height)
-                    draw.rectangle(ch_box, outline=(0, 256, 0))
+                    # draw.rectangle(ch_box, outline=(0, 256, 0))
                     width_offset += ch_width
+                    char_list.append((ch_box, ch))
 
-            if filename is None or len(filename) == 0:
+            if idx is None or output_path is None:
                 import uuid
                 filename = '%s.png' % uuid.uuid4()
+            else:
+                filename = join(output_path, 'images', '%d.png' % idx)
             im.save(filename)
+
+            self.makeXML(char_list, filename, idx=idx, output_path=output_path)
 
         return sum([len(ch[2]) for ch in self.chars])
 
@@ -212,7 +266,7 @@ class CH_Dataset():
                          + [x for x in (ascii_lowercase + ascii_uppercase)] + [str(x) for x in range(10)] + [x for x in
                                                                                                              '~!@#$%^&*()_+-=<>?,.;:[]{}|']
 
-        # self.char_list = self.char_list[:100]
+        self.char_list = self.char_list[:100]
         self.font_list = [join(font_path, f) for f in listdir(font_path) if
                           isfile(join(font_path, f)) and f.find('.DS_Store') == -1]
 
@@ -293,10 +347,11 @@ class CH_Dataset():
         '''
         generate samples:
             1. generate (font, size) tuple
-            1. create N char list(N = # of (font, size) tuple)
-            1. shuffle each char list
+            2. create N char list(N = # of (font, size) tuple)
+            3. shuffle each char list
+            4. create
 
-        :param n_char: number of char per font & size
+        :param n_char: number of char per sentence
         :param ratio: fill area ratio of image with character region
         :param width: width of image
         :param height: height of image
@@ -316,23 +371,50 @@ class CH_Dataset():
         if output_path is not None:
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
-            if not os.path.exists(join(output_path, 'image')):
-                os.makedirs(join(output_path, 'image'))
-            if not os.path.exists(join(output_path, 'annotation')):
-                os.makedirs(join(output_path, 'annotation'))
+            if not os.path.exists(join(output_path, 'images')):
+                os.makedirs(join(output_path, 'images'))
+            if not os.path.exists(join(output_path, 'annotations')):
+                os.makedirs(join(output_path, 'annotations'))
 
         output_idx = 0
         while self.hasMoreData() is True:
             gen_img = Sample_IMG.generate(self, n_char=n_char, fill_ratio=fill_ratio, width=width, height=height)
             if gen_img:
-                total_chars += gen_img.prn(chDataset=self, filename=join(output_path, '%d.png' % output_idx))
+                total_chars += gen_img.prn(chDataset=self, idx=output_idx, output_path=output_path)
                 results.append(gen_img)
                 output_idx += 1
-                # break
 
-        print(total_chars)
+
+        NUMBER_OF_IMAGES = output_idx
+        # split train/val/test set
+        shuffled_index = list(range(NUMBER_OF_IMAGES))
+        random.shuffle(shuffled_index)
+
+        # splitting train/validation/test set (unit: %)
+        TRAIN_SET = 80
+        VALID_SET = 10
+        TEST_SET = 10
+        num_train = int(NUMBER_OF_IMAGES * TRAIN_SET / (TRAIN_SET + VALID_SET + TEST_SET))
+        num_valid = int(NUMBER_OF_IMAGES * VALID_SET / (TRAIN_SET + VALID_SET + TEST_SET))
+        num_test = NUMBER_OF_IMAGES - num_train - num_valid
+
+        with open(join(output_path, 'train.txt'), "w") as wf:
+            for index in shuffled_index[0:num_train]:
+                wf.write(str(index) + '\n')
+
+        with open(join(output_path, 'val.txt'), "w") as wf:
+            for index in shuffled_index[num_train:num_train + num_valid]:
+                wf.write(str(index) + '\n')
+
+        with open(join(output_path, 'test.txt'), "w") as wf:
+            for index in shuffled_index[num_train + num_valid:]:
+                wf.write(str(index) + '\n')
+
+        print("Train / Valid / Test : {} / {} / {}".format(num_train, num_valid, num_test))
+        print("Output path: {}".format(output_path))
+
         return results
 
 
 chd = CH_Dataset(font_path='fonts')
-chd.generateSamples(output_path='font_dataset')
+chd.generateSamples(output_path='data/font_dataset')

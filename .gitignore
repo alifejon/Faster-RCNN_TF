@@ -7,6 +7,7 @@ VGGnet_fast_rcnn_iter_70000.ckpt
 VOCdevkit/
 data/VOCdevkit2007
 data/pretrain_model/
+data/font_dataset
 .DS_Store
 *.bak
 output
