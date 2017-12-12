@@ -199,7 +199,7 @@ class Sample_IMG():
 
         char_list = []
 
-        base_font = ImageFont.truetype('/Library/Fonts/AppleGothic.ttf', 10)
+        # base_font = ImageFont.truetype('/Library/Fonts/AppleGothic.ttf', 10)
         if chDataset is not None:
             im = Image.new('RGB', (800, 600), color=(256, 256, 256))
             draw = ImageDraw.Draw(im)
@@ -270,7 +270,7 @@ class CH_Dataset():
         self.font_list = [join(font_path, f) for f in listdir(font_path) if
                           isfile(join(font_path, f)) and f.find('.DS_Store') == -1]
 
-        self.font_sizes = [10] * 2 + [20] * 5 + [30] * 3 + [50] * 2 + [100]
+        self.font_sizes = [10] * 5 + [20] * 10 + [30] * 7 + [50] * 5 + [100] * 2
 
         print('total # of chars', len(self.char_list) * len(self.font_list) * len(self.font_sizes))
 
@@ -384,7 +384,6 @@ class CH_Dataset():
                 results.append(gen_img)
                 output_idx += 1
 
-
         NUMBER_OF_IMAGES = output_idx
         # split train/val/test set
         shuffled_index = list(range(NUMBER_OF_IMAGES))
@@ -410,6 +409,10 @@ class CH_Dataset():
             for index in shuffled_index[num_train + num_valid:]:
                 wf.write(str(index) + '\n')
 
+        with open(join(output_path, 'labels.txt'), "w") as wf:
+            for label in self.char_list:
+                wf.write(str(label) + '\n')
+
         print("Train / Valid / Test : {} / {} / {}".format(num_train, num_valid, num_test))
         print("Output path: {}".format(output_path))
 
@@ -417,4 +420,4 @@ class CH_Dataset():
 
 
 chd = CH_Dataset(font_path='fonts')
-chd.generateSamples(output_path='data/font_dataset')
+chd.generateSamples(output_path='data/fontdataset')

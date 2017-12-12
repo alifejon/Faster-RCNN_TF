@@ -99,6 +99,13 @@ for split in ['train', 'val', 'trainval', 'test']:
     __sets[name] = (lambda split=split:
             datasets.phd08.phd08(split))
 
+# FONT dataset
+for split in ['train', 'val', 'trainval', 'test']:
+    name = 'fontdataset_{}'.format(split)
+    print name
+    __sets[name] = (lambda split=split:
+            datasets.fontdataset.fontdataset(split))
+
 def get_imdb(name):
     """Get an imdb (image database) by name."""
     if not __sets.has_key(name):
