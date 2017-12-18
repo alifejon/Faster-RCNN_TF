@@ -16,6 +16,7 @@ import datasets.kitti_tracking
 import datasets.coco
 import datasets.kaist_scene
 import datasets.phd08
+import datasets.fontdataset
 import numpy as np
 
 def _selective_search_IJCV_top_k(split, year, top_k):

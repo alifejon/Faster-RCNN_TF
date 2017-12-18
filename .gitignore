@@ -8,6 +8,7 @@ VOCdevkit/
 data/VOCdevkit2007
 data/pretrain_model/
 data/font_dataset
+data/fontdataset
 .DS_Store
 *.bak
 output

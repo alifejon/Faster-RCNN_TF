@@ -405,6 +405,10 @@ class CH_Dataset():
             for index in shuffled_index[num_train:num_train + num_valid]:
                 wf.write(str(index) + '\n')
 
+        with open(join(output_path, 'trainval.txt'), "w") as wf:
+            for index in shuffled_index[0:num_train + num_valid]:
+                wf.write(str(index) + '\n')
+
         with open(join(output_path, 'test.txt'), "w") as wf:
             for index in shuffled_index[num_train + num_valid:]:
                 wf.write(str(index) + '\n')

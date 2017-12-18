@@ -35,7 +35,7 @@ class fontdataset(imdb):
         self._data_path = os.path.join(self._devkit_path, 'fontdataset')
         self._classes = self._get_classes()
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))
-        self._image_ext = '.jpg'
+        self._image_ext = '.png'
         self._image_index = self._load_image_set_index()
         # Default to roidb handler
         #self._roidb_handler = self.selective_search_roidb
@@ -90,7 +90,8 @@ class fontdataset(imdb):
         """
         Return the default path where PASCAL VOC is expected to be installed.
         """
-        return os.path.join(cfg.DATA_DIR, 'fontdataset')
+        return os.path.join(cfg.DATA_DIR)
+        # return os.path.join(cfg.DATA_DIR, 'fontdataset')
 
     def _get_classes(self):
         """
